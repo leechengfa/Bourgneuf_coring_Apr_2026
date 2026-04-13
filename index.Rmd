@@ -236,7 +236,7 @@ csv.dbd$Method <- factor(csv.dbd$Method, levels = c('mix', 'slice', 'slice_avera
 csv.dbd$substrate <- str_to_title(csv.dbd$substrate)
 ```
 
-The difference in dry bulk density between the mixed whole core and the averaged slices ranged between `r csv.dbd.average %>% filter(substrate == 'mud') %>% select(percent_diff_dry_bulk_density) %>% min() %>% format(digits = 2, nsmall = 1)`% and `r csv.dbd.average %>% filter(substrate == 'mud') %>% select(percent_diff_dry_bulk_density) %>% max() %>% format(digits = 2, nsmall = 1)`% for the persistent seagrass meadow with muddy substrate and `r csv.dbd.average %>% filter(substrate == 'sand') %>% select(percent_diff_dry_bulk_density) %>% min() %>% format(digits = 2, nsmall = 1)`% and `r csv.dbd.average %>% filter(substrate == 'sand') %>% select(percent_diff_dry_bulk_density) %>% max() %>% format(digits = 2, nsmall = 1)`% for the sandy substrate. Notably, there was a huge difference in the 'Sand 3' replicate (Figure \@ref(fig:dryBulkDensityVerticalProfile)). 
+The difference in dry bulk density between the mixed whole core and the averaged slices ranged between `r csv.dbd.average %>% filter(substrate == 'mud') %>% select(percent_diff_dry_bulk_density) %>% min() %>% format(digits = 2, nsmall = 1)`% and `r csv.dbd.average %>% filter(substrate == 'mud') %>% select(percent_diff_dry_bulk_density) %>% max() %>% format(digits = 2, nsmall = 1)`% for the persistent seagrass meadow with muddy substrate and `r csv.dbd.average %>% filter(substrate == 'sand') %>% select(percent_diff_dry_bulk_density) %>% min() %>% format(digits = 2, nsmall = 1)`% and `r csv.dbd.average %>% filter(substrate == 'sand') %>% select(percent_diff_dry_bulk_density) %>% max() %>% format(digits = 2, nsmall = 1)`% for the sandy substrate. Notably, there was a huge difference in the 'Sand 3' replicate (Figure \@ref(fig:dryBulkDensityVerticalProfile)). When 'Sand 3' is excluded, the largest difference is `r csv.dbd.average %>% filter(!ID == 'Sand_3') %>% select(percent_diff_dry_bulk_density) %>% max() %>% format(digits = 2, nsmall = 1)`%. The presence of shells in the slices did not cause any seemingly anomalous patterns to the vertical profile.
 
 ```{r dryBulkDensityVerticalProfile}
 #| echo: false
@@ -246,15 +246,17 @@ The difference in dry bulk density between the mixed whole core and the averaged
 #| fig.width: 8
 #| fig.height: 6
 #| fig.align: 'center'
-#| fig.cap: Benthic soil/substrate dry bulk density vertical profile at Bourgneuf Bay
+#| fig.cap: Benthic soil/substrate dry bulk density vertical profile at Bourgneuf Bay. The two different methods are represented by different colours and the averaged values of all the slices are represented by a dotted line. Any points with the presence of shells in the sample are highlighted with a solid dot.
 
 p.dbd.vertprof <- csv.dbd %>%
   ggplot(aes(x = slice_start + 5, y = dry_bulk_density, colour = Method)) +
   geom_line(aes(linetype = Method), linewidth = 1) +
+  geom_point(aes(shape = shell), size = 2.5) +
   xlim(c(100,0)) + ylim(c(0, max(csv.dbd$dry_bulk_density))) +coord_flip() +
   xlab('Depth (cm)') + ylab(bquote('Dry Bulk Density'~(g/cm^3))) +
   scale_colour_manual('Method', values = c('navy', 'yellow3', 'orange')) +
   scale_linetype_manual(values = c(1, 1, 2)) +
+  scale_shape_manual('Presence\nof shell', values = c(NA, 19)) +
   facet_grid(substrate ~ rep) +
   ggtitle('Vertical profile of the benthic dry bulk density')
 
