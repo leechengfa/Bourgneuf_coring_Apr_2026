@@ -20,7 +20,7 @@ library(stringr)
 library(ggplot2)
 # library(ggiraph)
 # library(ggpubr)
-# library(patchwork)
+library(patchwork)
 ```
 
 This page explores the use of a [Russian Peat Corer](https://www.vanwalt.com/news/2014/05/15/peat-sampler-or-russian-corer-either-way-a-really-useful-sediment-sampling-tool/) (Figure \@ref(fig:russianCorer)). 
@@ -207,7 +207,7 @@ csv.dbd.average <- csv.dbd %>%
     ) %>%
   ungroup()
 
-
+# adding the extra row for the vertical profile of the single points
 csv.dbd <- csv.dbd %>%
   filter(Method == 'mix') %>%
   mutate(slice_start = slice_end - 10) %>%
@@ -261,6 +261,60 @@ p.dbd.vertprof <- csv.dbd %>%
   ggtitle('Vertical profile of the benthic dry bulk density')
 
 p.dbd.vertprof
+```
+
+```{r dryBulkDensityStats}
+#| echo: false
+#| error: false
+#| message: false
+#| warning: false
+
+
+```
+
+```{r dryBulkDensityBoxplot}
+#| echo: false
+#| error: false
+#| message: false
+#| warning: false
+#| fig.width: 8
+#| fig.height: 6
+#| fig.align: 'center'
+#| fig.cap: Boxplot of the dry bulk density at Bourgneuf Bay using the whole core (mixed) approach and the aggregated subcoring approach. 
+
+ylims <- csv.dbd %>%
+  filter(Method != 'Subcoring') %>%
+  filter(slice_start == 0) %>% 
+  select(dry_bulk_density) %>% 
+  summarise(min_dbd = min(dry_bulk_density), max_dbd = max(dry_bulk_density)) %>%
+  unlist()
+
+p.dbd.boxplot <- csv.dbd %>%
+  filter(Method != 'Subcoring') %>%
+  filter(slice_start == 0) %>% # remove dupe rows
+  ggplot(aes(x = substrate, y = dry_bulk_density, fill = Method)) +
+  geom_boxplot() +
+  geom_point(aes(colour = Method), position = position_jitterdodge(jitter.width = 0.5), show.legend = FALSE) +
+  xlab('Sediment type') + ylab(bquote('Dry Bulk Density'~(g/cm^3))) +
+  ylim(ylims) +
+  scale_fill_manual('Method', values = c('lightblue3', 'yellow2')) +
+  scale_colour_manual('Method', values = c('navy', 'orange3')) +
+  ggtitle('All reps')
+
+p.dbd.boxplot.filt <- csv.dbd %>%
+  filter(Method != 'Subcoring') %>%
+  filter(slice_start == 0) %>% # remove dupe rows
+  filter(ID != 'Sand_3') %>%
+  ggplot(aes(x = substrate, y = dry_bulk_density, fill = Method)) +
+  geom_boxplot() +
+  geom_point(aes(colour = Method), position = position_jitterdodge(jitter.width = 0.5), show.legend = FALSE) +
+  xlab('Sediment type') + ylab(bquote('Dry Bulk Density'~(g/cm^3))) +
+  ylim(ylims) +
+  scale_fill_manual('Method', values = c('lightblue3', 'yellow2')) +
+  scale_colour_manual('Method', values = c('navy', 'orange3')) +
+  ggtitle('No "Sand 3"')
+
+p.dbd.boxplot + p.dbd.boxplot.filt + plot_layout(guides = 'collect', axes = 'collect')
 ```
 
 ## TOC measurement
