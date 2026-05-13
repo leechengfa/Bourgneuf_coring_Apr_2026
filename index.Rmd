@@ -352,9 +352,9 @@ tTest.wide.averaged <- csv.wide.dbd.averaged %>%
   t.test()
 ```
 
-Next, the difference in dry bulk density between the whole core (mixing) approach and the subcoring (slice) approach was investigated. The whole core's (mixing) dry bulk density was subtracted from the slices and the averaged slices of the subcoring (slice) approach. Assuming that the whole core approach is representative of the subcoring approach, the difference should be zero. Figure \@ref(fig:diffBetweenMethodsboxplot) shows that although the boxplot's interquartile range for all slices include zero, the confidence interval barely doesn't contain zero at `r tTest.wide.slice $conf.int[1] %>% format(digits = 2)`% to `r tTest.wide.slice $conf.int[2] %>% format(digits = 2)`%. Thus, based on the difference between the whole core dry bulk density to the dry bulk density of all the slices, there is a significant difference (p-value = `r tTest.wide.slice$p.value %>% format(digits = 2)`) and the whole core approach is not similar. However, when the slices were averaged and then compared to the whole core, the confidence interval ranges from `r tTest.wide.averaged $conf.int[1] %>% format(digits = 2)`% to `r tTest.wide.averaged $conf.int[2] %>% format(digits = 2)`%, which includes zero. While its boxplot's interquartile range barely excludes zero, there is no significant difference (p-value = `r tTest.wide.averaged$p.value %>% format(digits = 2)`). 
+Next, the difference in dry bulk density between the whole core (mixing) approach was investigated. The whole core's (mixing) dry bulk density was subtracted from the averaged slices of the subcoring (slice) approach. Assuming that the whole core approach is representative of the subcoring approach, the difference should be zero. Figure \@ref(fig:diffBetweenMethodsboxplot) shows that the averaged slices and the mixed approach were not significantly different (p-value = `r tTest.wide.averaged$p.value %>% format(digits = 2)`), with a confidence interval range of `r tTest.wide.averaged $conf.int[1] %>% format(digits = 2)`% to `r tTest.wide.averaged $conf.int[2] %>% format(digits = 2)`%, which includes zero.   
 
-The median difference when considering all slices to the mixed cores is `r csv.wide.dbd.slice %>% select(-full, -ID) %>% pivot_longer(everything()) %>% select(value) %>% unlist() %>% median(na.rm = TRUE) %>% format(digits = 2)`%. The median difference for the averaged slices to the mixed cores is `r csv.wide.dbd.averaged %>% select(diff) %>% unlist() %>% median(na.rm = TRUE) %>% format(digits = 2)`%. 
+The median difference for the averaged slices to the mixed cores is `r csv.wide.dbd.averaged %>% select(diff) %>% unlist() %>% median(na.rm = TRUE) %>% format(digits = 2)`%. 
 
 ```{r diffBetweenMethodsboxplot}
 #| echo: false
@@ -362,22 +362,22 @@ The median difference when considering all slices to the mixed cores is `r csv.w
 #| message: false
 #| warning: false
 #| fig.align: 'center'
-#| fig.cap: Boxplot of the percent difference in dry bulk density at Bourgneuf Bay based on subtracting the dry bulk density of the whole core approach from the slices and the averaged slices of the subcoring approach, and then taking the median slice dry bulk density as a reference. The blue points are the actual difference values, while the red line is the y-intercept at zero, and the green error bars are the 95% confidence interval. The asterisk denotes a significant difference where the true mean of these difference values is not equal to zero.
+#| fig.cap: Boxplot of the percent difference in dry bulk density at Bourgneuf Bay based on subtracting the dry bulk density of the whole core approach from the averaged slices of the subcoring approach, and then taking the median slice dry bulk density as a reference. The blue points are the actual difference values, while the red line is the y-intercept at zero, and the green error bars are the 95% confidence interval. The asterisk denotes a significant difference where the true mean of these difference values is not equal to zero.
 
-ylim.diff <- c(-45,45)
+# ylim.diff <- c(-45,45)
 
-p.wide.slice <- csv.wide.dbd.slice %>%
-  select(-full, -ID) %>% 
-  pivot_longer(everything()) %>%
-  ggplot(aes(y = value)) +
-    geom_hline(yintercept = 0, colour = 'red') +
-    geom_boxplot(width = 0.2) + 
-    geom_errorbar(aes(x= 0, ymin = tTest.wide.slice$conf.int[1], ymax = tTest.wide.slice$conf.int[2]), width = 0.1, size = 1, colour = 'green') +
-    geom_point(aes(x = 0), position = position_jitter(width = 0.1), colour = 'blue') +
-    geom_point(aes(x = 0, y = 43), shape = '*', size = 5) +
-    ylim(ylim.diff) + ylab('Percent difference in dry bulk density (%)') + xlim(c(-0.25, 0.25)) +
-    theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) + xlab('') +
-    ggtitle('All slices')
+# p.wide.slice <- csv.wide.dbd.slice %>%
+#   select(-full, -ID) %>% 
+#   pivot_longer(everything()) %>%
+#   ggplot(aes(y = value)) +
+#     geom_hline(yintercept = 0, colour = 'red') +
+#     geom_boxplot(width = 0.2) + 
+#     geom_errorbar(aes(x= 0, ymin = tTest.wide.slice$conf.int[1], ymax = tTest.wide.slice$conf.int[2]), width = 0.1, size = 1, colour = 'green') +
+#     geom_point(aes(x = 0), position = position_jitter(width = 0.1), colour = 'blue') +
+#     geom_point(aes(x = 0, y = 43), shape = '*', size = 5) +
+#     ylim(ylim.diff) + ylab('Percent difference in dry bulk density (%)') + xlim(c(-0.25, 0.25)) +
+#     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) + xlab('') +
+#     ggtitle('All slices')
 
 p.wide.averaged <- csv.wide.dbd.averaged %>%
   ggplot(aes(y = diff)) +
@@ -385,11 +385,13 @@ p.wide.averaged <- csv.wide.dbd.averaged %>%
     geom_boxplot(width = 0.2) + 
     geom_errorbar(aes(x= 0, ymin = tTest.wide.averaged$conf.int[1], ymax = tTest.wide.averaged$conf.int[2]), width = 0.1, size = 1, colour = 'green') +
     geom_point(aes(x = 0), position = position_jitter(width = 0.1), colour = 'blue') +
-    ylim(ylim.diff) + ylab('Percent difference in dry bulk density (%)') + xlim(c(-0.25, 0.25)) +
+    # ylim(ylim.diff) + 
+    ylab('Percent difference in dry bulk density (%)') + xlim(c(-0.25, 0.25)) +
     theme(axis.text.x = element_blank(), axis.ticks.x = element_blank()) + xlab('') +
     ggtitle('Averaged slice')
 
-p.wide.slice + p.wide.averaged + 
+# p.wide.slice + 
+p.wide.averaged + 
   plot_annotation('Percent difference in dry bulk density between the slice and mix methods') +
   plot_layout(axis_titles = 'collect')
 ```
